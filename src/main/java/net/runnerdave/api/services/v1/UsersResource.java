@@ -28,158 +28,139 @@ import io.swagger.annotations.ApiResponse;
  * Created by runnerdave on 13/02/17.
  */
 @Path("/v1/users")
-@Api(value = "/users", description="Manage Users")
+@Api(value = "/users", description = "Manage Users")
 public class UsersResource {
 	private static final Logger log = Logger.getLogger(UsersResource.class.getName());
-	
-    @GET
-    @Path("/{userId}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value="Find User", 
-    		notes = "This API retrieves the public information for the user (Private info is returned if this is the auth user)" + 
-    			    "<u>Input Parameters</u><ul><li><b>userId</b> is required</li></ul>")
-    @ApiResponses(value = { 
-			@ApiResponse(code = 200, message = "Success: { user profile }"),
-			@ApiResponse(code = 400, message = "Failed: {\"error\":\"error description\", \"status\":\"FAIL\"}") 
-			} )
-    public Response getUserById(@ApiParam(value = "userId", required = true, defaultValue = "23456", allowableValues = "", allowMultiple = false)
-	@PathParam("userId") String userId) {
-    	
-    	log.info("UsersResource::getUserById started userId=" + userId);
-    	
-    	User user = BusinessManager.getInstance().getUserById("dd");
-    	
-    	
-    	return Response.status(Response.Status.OK).entity(user).build();
-    }
-    
-    @GET
-    @Path("/")
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value="Find all users", 
-    		notes = "This API retrieves the public information for the all users")
-    @ApiResponses(value = { 
-			@ApiResponse(code = 200, message = "Success: { user profile }"),
-			@ApiResponse(code = 400, message = "Failed: {\"error\":\"error description\", \"status\":\"FAIL\"}") 
-			} )
-    public Response getUsers() {
-    	
-    	log.info("UsersResource::getUsers started");
-    	
-    	List<User> users = BusinessManager.getInstance().getUsers();
-    	
-    	UsersHolder userHolder = new UsersHolder();
-		
+
+	@GET
+	@Path("/{userId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiOperation(value = "Find User", notes = "This API retrieves the public information for the user (Private info is returned if this is the auth user)"
+			+ "<u>Input Parameters</u><ul><li><b>userId</b> is required</li></ul>")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success: { user profile }"),
+			@ApiResponse(code = 400, message = "Failed: {\"error\":\"error description\", \"status\":\"FAIL\"}") })
+	public Response getUserById(
+			@ApiParam(value = "userId", required = true, defaultValue = "23456", allowableValues = "", allowMultiple = false) @PathParam("userId") String userId) {
+
+		log.info("UsersResource::getUserById started userId=" + userId);
+
+		try {
+			User user = BusinessManager.getInstance().getUserById(userId);
+
+			return Response.status(Response.Status.OK).entity(user).build();
+		} catch (Exception e) {
+
+		}
+
+		return Response.status(Response.Status.BAD_REQUEST)
+				.entity("{\"error\":\"Could Not Find User\", \"status\":\"FAIL\"}").build();
+	}
+
+	@GET
+	@Path("/")
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiOperation(value = "Find all users", notes = "This API retrieves the public information for the all users")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success: { user profile }"),
+			@ApiResponse(code = 400, message = "Failed: {\"error\":\"error description\", \"status\":\"FAIL\"}") })
+	public Response getUsers() {
+
+		log.info("UsersResource::getUsers started");
+
+		List<User> users = BusinessManager.getInstance().getUsers();
+
+		UsersHolder userHolder = new UsersHolder();
+
 		userHolder.setUsers(users);
-    	
-    	
-    	return Response.status(Response.Status.OK).entity(userHolder).build();
-    }
-    
-    @POST
+
+		return Response.status(Response.Status.OK).entity(userHolder).build();
+	}
+
+	@POST
 	@Path("/")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	@ApiOperation(value = "Create a new User", 
-    notes = "This API creates a new user if the username does not exist" + 
-    "<p><u>Input Parameters</u><ul><li><b>new user object</b> is required</li></ul>")
+	@ApiOperation(value = "Create a new User", notes = "This API creates a new user if the username does not exist"
+			+ "<p><u>Input Parameters</u><ul><li><b>new user object</b> is required</li></ul>")
 	@ApiResponses(value = { @ApiResponse(code = 201, message = "Success: { user profile }"),
-    @ApiResponse(code = 400, message = "Failed: {\"error\":\"error description\", \"status\":\"FAIL\"}") })
+			@ApiResponse(code = 400, message = "Failed: {\"error\":\"error description\", \"status\":\"FAIL\"}") })
 	public Response createUser(
-			   @ApiParam(value = "New User", required = true, defaultValue = "\"{\"name\":\"Tom Jay\"}\"", allowableValues = "", allowMultiple = false)
-			User user) {
-		
+			@ApiParam(value = "New User", required = true, defaultValue = "\"{\"name\":\"Tom Jay\"}\"", allowableValues = "", allowMultiple = false) User user) {
+
 		try {
 			User newUser = BusinessManager.getInstance().addUser(user);
-			
+
 			return Response.status(Response.Status.CREATED).entity(newUser).build();
+		} catch (Exception e) {
+
 		}
-		catch (Exception e) {
-			
-		}
-		
+
 		return Response.status(Response.Status.BAD_REQUEST)
-				.entity("{\"error\":\"Could Not Create User\", \"status\":\"FAIL\"}")
-				.build();
-		
+				.entity("{\"error\":\"Could Not Create User\", \"status\":\"FAIL\"}").build();
+
 	}
-    
-    @PUT
+
+	@PUT
 	@Path("/{userId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	@ApiOperation(value = "Update User", 
-    notes = "This API updates the user")
+	@ApiOperation(value = "Update User", notes = "This API updates the user")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success: { user profile }"),
-    @ApiResponse(code = 400, message = "Failed: {\"error\":\"error description\", \"status\":\"FAIL\"}") })
+			@ApiResponse(code = 400, message = "Failed: {\"error\":\"error description\", \"status\":\"FAIL\"}") })
 	public Response updateUser(@PathParam("userId") String userId, String jsonString) {
 
 		/*
-		 * { 
+		 * {
 		 * 
 		 * "name":"Tom T Jay"
 		 * 
 		 * } }
 		 */
-		
+
 		String name;
-		
+
 		try {
 			Object obj = JSONValue.parse(jsonString);
 
 			JSONObject jsonObject = (JSONObject) obj;
 			name = (String) jsonObject.get("name");
 
+		} catch (Exception e) {
+			return Response.status(Response.Status.BAD_REQUEST)
+					.entity("{\"error\":\"Invalid or Missing fields error\", \"status\":\"FAIL\"}").build();
 		}
-		 catch (Exception e) {
-				return Response.status(Response.Status.BAD_REQUEST)
-						.entity("{\"error\":\"Invalid or Missing fields error\", \"status\":\"FAIL\"}")
-						.build();
-			}
-		
+
 		try {
-			User updatedUser = BusinessManager.getInstance().updateUserAttribute(
-				userId, "name", name);
-		
+			User updatedUser = BusinessManager.getInstance().updateUserAttribute(userId, "name", name);
+
 			return Response.status(Response.Status.OK).entity(updatedUser).build();
+		} catch (Exception e) {
+
 		}
-		catch (Exception e) {
-			
-		}
-		
+
 		return Response.status(Response.Status.BAD_REQUEST)
-				.entity("{\"error\":\"Could Not Update User\", \"status\":\"FAIL\"}")
-				.build();
+				.entity("{\"error\":\"Could Not Update User\", \"status\":\"FAIL\"}").build();
 
-
-		
 	}
-    
-    @DELETE
+
+	@DELETE
 	@Path("/{userId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	@ApiOperation(value = "Update User", 
-    notes = "This API deletes the user")
+	@ApiOperation(value = "Update User", notes = "This API deletes the user")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success: {  }"),
-    @ApiResponse(code = 400, message = "Failed: {\"error\":\"error description\", \"status\":\"FAIL\"}") })
+			@ApiResponse(code = 400, message = "Failed: {\"error\":\"error description\", \"status\":\"FAIL\"}") })
 	public Response deleteUser(@PathParam("userId") String userId) {
 
-		
 		try {
 			BusinessManager.getInstance().deleteUser(userId);
-		
+
 			return Response.status(Response.Status.OK).entity("{}").build();
+		} catch (Exception e) {
+
 		}
-		catch (Exception e) {
-			
-		}
-		
+
 		return Response.status(Response.Status.BAD_REQUEST)
-				.entity("{\"error\":\"Could Not Update User\", \"status\":\"FAIL\"}")
-				.build();
+				.entity("{\"error\":\"Could Not Update User\", \"status\":\"FAIL\"}").build();
 
-
-		
 	}
 }

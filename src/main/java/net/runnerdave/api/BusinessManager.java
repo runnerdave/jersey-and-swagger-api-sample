@@ -1,7 +1,6 @@
 package net.runnerdave.api;
 
 import java.util.List;
-import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
@@ -24,46 +23,26 @@ public class BusinessManager {
 		}
 	}
 	
-	public User getUserById(String id) {
+	public User getUserById(String id) throws Exception {
 		log.info("BusinessManager::getUserById started userId=" + id);
-		User user = new User();
-    	user.setId("111125");
-    	user.setName("Tom Jay");
+		User user = DataManager.getInstance().findUserByID(id);
+		if (user == null) {
+			throw new Exception("User not found!");
+		}
     	return user;
 	}
 	
-	public List<User> getUsers() {
-		List<User> users = new ArrayList<User>();
-		log.info("BusinessManager::getUsers started");
-		
-		User user = new User();
-    	user.setId("111125");
-    	user.setName("Tom Jay");
-    	users.add(user);
-    	user = new User();
-    	user.setId("111126");
-    	user.setName("Paul Gay");
-    	users.add(user);
-    	
-    	return users;
+	public List<User> getUsers() {		    	
+    	return DataManager.getInstance().getAllUsers();
 	}
 
 	public User addUser(User user) {
-		User newUser = new User();
-		newUser.setId("111126");
-		newUser.setName("Petra Perez");
+		User newUser = DataManager.getInstance().insertUser(user);
 		return newUser;
 	}
 
 	public User updateUserAttribute(String userId, String attribute, String value) {
-		User user = new User();
-		user.setId(userId);
-		
-		if (attribute == "name") {
-			user.setName(value);
-		}
-		
-		return user;
+		return DataManager.getInstance().updateUserAttribute(userId, attribute, value);
 	}
 
 	public void deleteUser(String userId) {
