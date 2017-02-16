@@ -46,7 +46,7 @@ public class BusinessManager {
 	}
 
 	public void deleteUser(String userId) {
-		return;
+		DataManager.getInstance().deleteUser(userId);
 	}
 	
 	

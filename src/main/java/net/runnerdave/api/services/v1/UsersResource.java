@@ -108,14 +108,6 @@ public class UsersResource {
 			@ApiResponse(code = 400, message = "Failed: {\"error\":\"error description\", \"status\":\"FAIL\"}") })
 	public Response updateUser(@PathParam("userId") String userId, String jsonString) {
 
-		/*
-		 * {
-		 * 
-		 * "name":"Tom T Jay"
-		 * 
-		 * } }
-		 */
-
 		String name;
 
 		try {
@@ -146,7 +138,7 @@ public class UsersResource {
 	@Path("/{userId}")
 	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	@ApiOperation(value = "Update User", notes = "This API deletes the user")
+	@ApiOperation(value = "Delete User", notes = "This API deletes the user")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success: {  }"),
 			@ApiResponse(code = 400, message = "Failed: {\"error\":\"error description\", \"status\":\"FAIL\"}") })
 	public Response deleteUser(@PathParam("userId") String userId) {
@@ -156,11 +148,11 @@ public class UsersResource {
 
 			return Response.status(Response.Status.OK).entity("{}").build();
 		} catch (Exception e) {
-
+			log.error("UsersResource::deleteUser, error deleting the user. Exception:" + e.getMessage());
 		}
 
 		return Response.status(Response.Status.BAD_REQUEST)
-				.entity("{\"error\":\"Could Not Update User\", \"status\":\"FAIL\"}").build();
+				.entity("{\"error\":\"Could Not Delete User\", \"status\":\"FAIL\"}").build();
 
 	}
 }
