@@ -55,6 +55,18 @@
         </dependency>
     </dependencies>
     <build>
-        <finalName>jersey_rest</finalName>
+        <finalName>jersey_rest</finalName> 
+        <plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<archive>
+					  <addMavenDescriptor>false</addMavenDescriptor>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>           
     </build>
 </project>
