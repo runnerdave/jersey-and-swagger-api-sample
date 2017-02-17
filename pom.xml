@@ -7,6 +7,30 @@
     <version>1.0-SNAPSHOT</version>
     <name>jersey_rest Maven Webapp</name>
     <url>http://maven.apache.org</url>
+    <profiles>
+        <!-- The configuration of the development profile -->
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <build.profile.id>default</build.profile.id>
+            </properties>
+        </profile>
+        <profile>
+            <id>rmitDesktop</id>
+            <properties>
+                <build.profile.id>rmitDesktop</build.profile.id>
+            </properties>
+        </profile>
+        <profile>
+            <id>rmitLaptop</id>
+            <properties>
+                <build.profile.id>rmitLaptop</build.profile.id>
+            </properties>
+        </profile>
+    </profiles>
     <dependencies>
         <dependency>
             <groupId>io.swagger</groupId>
@@ -55,7 +79,16 @@
         </dependency>
     </dependencies>
     <build>
-        <finalName>jersey_rest</finalName> 
+        <finalName>jersey_rest</finalName>
+        <filters>
+            <filter>profiles/${build.profile.id}/config.properties</filter>
+        </filters>
+        <resources>
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
         <plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -67,6 +100,23 @@
 					</archive>
 				</configuration>
 			</plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <move file="${project.build.outputDirectory}/ResourceBundleENV.properties"
+                                      tofile="${project.build.outputDirectory}/ResourceBundle.properties"/>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>           
     </build>
 </project>
