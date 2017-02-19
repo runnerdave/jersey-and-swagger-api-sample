@@ -98,6 +98,15 @@
 					<archive>
 					  <addMavenDescriptor>false</addMavenDescriptor>
 					</archive>
+                    <filters>
+                        <filter>profiles/${build.profile.id}/config.properties</filter>
+                    </filters>
+                    <webResources>
+                        <resource>
+                            <directory>src/main/webapp/api-docs</directory>
+                            <filtering>true</filtering>
+                        </resource>
+                    </webResources>
 				</configuration>
 			</plugin>
             <plugin>
@@ -112,6 +121,8 @@
                             <tasks>
                                 <move file="${project.build.outputDirectory}/ResourceBundleENV.properties"
                                       tofile="${project.build.outputDirectory}/ResourceBundle.properties"/>
+                                <!--move file="${project.build.outputDirectory}/indexENV.html"
+                                      tofile="${project.build.outputDirectory}/index.html"/-->
                             </tasks>
                         </configuration>
                     </execution>
